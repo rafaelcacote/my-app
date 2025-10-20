@@ -30,7 +30,7 @@ class UserUpdateRequest extends FormRequest
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email')
+                Rule::unique('shared.users', 'email')
                     ->ignore($userId)
                     ->whereNull('deleted_at'),
             ],
@@ -39,7 +39,7 @@ class UserUpdateRequest extends FormRequest
                 'string', 
                 'min:11',
                 'max:11', 
-                Rule::unique('users', 'cpf')
+                Rule::unique('shared.users', 'cpf')
                     ->ignore($userId)
                     ->whereNull('deleted_at')
             ],

@@ -1,13 +1,20 @@
 <?php
 
+use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\CepController;
+use App\Http\Controllers\CorController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\EstadoController;
 use App\Http\Controllers\LojaController;
+use App\Http\Controllers\MarcaController;
+use App\Http\Controllers\MovimentacaoEstoqueController;
 use App\Http\Controllers\MunicipioController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ProdutoController;
+use App\Http\Controllers\ProdutoVariacaoController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\TamanhoController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -38,6 +45,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('lojas/{loja}', [LojaController::class, 'update'])->name('empresas.lojas.update');
         Route::delete('lojas/{loja}', [LojaController::class, 'destroy'])->name('empresas.lojas.destroy');
     });
+    
+    // Rotas do Sistema de Produtos e Estoque
+    Route::resource('categorias', CategoriaController::class);
+    Route::resource('cores', CorController::class);
+    Route::resource('marcas', MarcaController::class);
+    Route::resource('tamanhos', TamanhoController::class);
+    Route::resource('produtos', ProdutoController::class);
+    Route::resource('produto-variacoes', ProdutoVariacaoController::class)->parameters(['produto-variacoes' => 'produtoVariacao']);
+    Route::resource('movimentacoes-estoque', MovimentacaoEstoqueController::class)->parameters(['movimentacoes-estoque' => 'movimentacaoEstoque']);
 });
 
 // API Routes para Estados, Municípios e CEP (protegidas por autenticação)
