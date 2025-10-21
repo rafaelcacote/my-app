@@ -17,6 +17,8 @@ class MarcaController extends Controller
      */
     public function index(Request $request): Response
     {
+        $this->checkPermission('marcas.index', 'Você não tem permissão para visualizar marcas.');
+        
         $query = Marca::query();
 
         // Filtro por status (ativo/inativo)
@@ -50,6 +52,8 @@ class MarcaController extends Controller
      */
     public function create(): Response
     {
+        $this->checkPermission('marcas.create', 'Você não tem permissão para criar marcas.');
+        
         return Inertia::render('marcas/Create');
     }
 
@@ -58,6 +62,8 @@ class MarcaController extends Controller
      */
     public function store(MarcaStoreRequest $request): RedirectResponse
     {
+        $this->checkPermission('marcas.store', 'Você não tem permissão para criar marcas.');
+        
         Marca::create($request->validated());
 
         return to_route('marcas.index')
@@ -69,6 +75,8 @@ class MarcaController extends Controller
      */
     public function show(Marca $marca): Response
     {
+        $this->checkPermission('marcas.show', 'Você não tem permissão para visualizar marcas.');
+        
         return Inertia::render('marcas/Show', [
             'marca' => $marca,
         ]);
@@ -79,6 +87,8 @@ class MarcaController extends Controller
      */
     public function edit(Marca $marca): Response
     {
+        $this->checkPermission('marcas.edit', 'Você não tem permissão para editar marcas.');
+        
         return Inertia::render('marcas/Edit', [
             'marca' => $marca,
         ]);
@@ -89,6 +99,8 @@ class MarcaController extends Controller
      */
     public function update(MarcaUpdateRequest $request, Marca $marca): RedirectResponse
     {
+        $this->checkPermission('marcas.update', 'Você não tem permissão para editar marcas.');
+        
         $marca->update($request->validated());
 
         return to_route('marcas.index')
@@ -100,6 +112,8 @@ class MarcaController extends Controller
      */
     public function destroy(Marca $marca): RedirectResponse
     {
+        $this->checkPermission('marcas.delete', 'Você não tem permissão para excluir marcas.');
+        
         $marca->delete();
 
         return to_route('marcas.index')

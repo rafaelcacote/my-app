@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import InputError from '@/components/InputError.vue';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useForm } from '@inertiajs/vue3';
 
 interface Tamanho {
     id: number;
@@ -14,8 +15,8 @@ interface Tamanho {
 }
 
 interface Props {
+    form: any;
     tamanho?: Tamanho;
-    form?: any;
     errors: Record<string, string>;
     processing: boolean;
     isCreate?: boolean;

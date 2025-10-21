@@ -49,7 +49,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                     </p>
                 </div>
                 <div class="flex gap-2">
-                    <Link :href="CorController.edit(cor).url">
+                    <Link :href="CorController.edit(cor.id).url">
                         <Button>
                             <Pencil class="mr-2 h-4 w-4" />
                             Editar

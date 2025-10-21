@@ -5,6 +5,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import InputError from '@/components/InputError.vue';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useForm } from '@inertiajs/vue3';
 
 interface Marca {
     id: number;
@@ -16,8 +17,8 @@ interface Marca {
 }
 
 interface Props {
+    form: any;
     marca?: Marca;
-    form?: any;
     errors: Record<string, string>;
     processing: boolean;
     isCreate?: boolean;

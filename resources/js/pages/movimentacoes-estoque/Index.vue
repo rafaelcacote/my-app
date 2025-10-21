@@ -26,7 +26,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Plus, Search, Pencil, Trash2, Eye, BarChart3, ArrowUp, ArrowDown, RotateCcw, ArrowRightLeft } from 'lucide-vue-next';
+import { Plus, Search, Pencil, Trash2, Eye, BarChart3, ArrowUp, ArrowDown, RotateCcw, ArrowRightLeft, Loader2 } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 
 interface Loja {
@@ -94,8 +94,7 @@ interface PaginatedMovimentacoesEstoque {
 interface Props {
     movimentacoesEstoque: PaginatedMovimentacoesEstoque;
     lojas: Loja[];
-    produtoVariacoes: ProdutoVariacao[];
-    filters: {
+    filters?: {
         search?: string;
         tipo?: string;
         loja_id?: string;
@@ -123,12 +122,12 @@ onMounted(() => {
 });
 
 // Filters
-const search = ref(props.filters.search || '');
-const tipo = ref(props.filters.tipo || '');
-const lojaId = ref(props.filters.loja_id || '');
-const produtoVariacaoId = ref(props.filters.produto_variacao_id || '');
-const dataInicio = ref(props.filters.data_inicio || '');
-const dataFim = ref(props.filters.data_fim || '');
+const search = ref(props.filters?.search || '');
+const tipo = ref(props.filters?.tipo || '');
+const lojaId = ref(props.filters?.loja_id || '');
+const produtoVariacaoId = ref(props.filters?.produto_variacao_id || '');
+const dataInicio = ref(props.filters?.data_inicio || '');
+const dataFim = ref(props.filters?.data_fim || '');
 
 // Delete dialog
 const showDeleteDialog = ref(false);

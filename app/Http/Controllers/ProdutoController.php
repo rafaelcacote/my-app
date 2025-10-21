@@ -19,6 +19,8 @@ class ProdutoController extends Controller
      */
     public function index(Request $request): Response
     {
+        $this->checkPermission('produtos.index', 'Você não tem permissão para visualizar produtos.');
+        
         $query = Produto::with(['categoria', 'marca']);
 
         // Filtro por status (ativo/inativo)
@@ -74,6 +76,8 @@ class ProdutoController extends Controller
      */
     public function create(): Response
     {
+        $this->checkPermission('produtos.create', 'Você não tem permissão para criar produtos.');
+        
         $categorias = Categoria::ativas()->orderBy('nome')->get();
         $marcas = Marca::ativas()->orderBy('nome')->get();
 
@@ -88,6 +92,8 @@ class ProdutoController extends Controller
      */
     public function store(ProdutoStoreRequest $request): RedirectResponse
     {
+        $this->checkPermission('produtos.store', 'Você não tem permissão para criar produtos.');
+        
         $data = $request->validated();
         
         // Calcular margem de lucro se não informada
@@ -108,6 +114,8 @@ class ProdutoController extends Controller
      */
     public function show(Produto $produto): Response
     {
+        $this->checkPermission('produtos.show', 'Você não tem permissão para visualizar produtos.');
+        
         $produto->load(['categoria', 'marca', 'produtoVariacoes.cor', 'produtoVariacoes.tamanho']);
 
         return Inertia::render('produtos/Show', [
@@ -120,6 +128,8 @@ class ProdutoController extends Controller
      */
     public function edit(Produto $produto): Response
     {
+        $this->checkPermission('produtos.edit', 'Você não tem permissão para editar produtos.');
+        
         $categorias = Categoria::ativas()->orderBy('nome')->get();
         $marcas = Marca::ativas()->orderBy('nome')->get();
 
@@ -135,6 +145,8 @@ class ProdutoController extends Controller
      */
     public function update(ProdutoUpdateRequest $request, Produto $produto): RedirectResponse
     {
+        $this->checkPermission('produtos.update', 'Você não tem permissão para editar produtos.');
+        
         $data = $request->validated();
         
         // Calcular margem de lucro se não informada
@@ -155,6 +167,8 @@ class ProdutoController extends Controller
      */
     public function destroy(Produto $produto): RedirectResponse
     {
+        $this->checkPermission('produtos.delete', 'Você não tem permissão para excluir produtos.');
+        
         $produto->delete();
 
         return to_route('produtos.index')

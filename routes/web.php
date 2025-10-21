@@ -2,19 +2,25 @@
 
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\CepController;
+use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\CorController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\EntradaMercadoriaController;
 use App\Http\Controllers\EstadoController;
+use App\Http\Controllers\FornecedorController;
 use App\Http\Controllers\LojaController;
 use App\Http\Controllers\MarcaController;
 use App\Http\Controllers\MovimentacaoEstoqueController;
 use App\Http\Controllers\MunicipioController;
+use App\Http\Controllers\PagamentoController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\ProdutoVariacaoController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TamanhoController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VendaController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -25,9 +31,7 @@ Route::get('/', function () {
     return redirect()->route('login');
 })->name('home');
 
-Route::get('dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 // Rotas de Empresas (protegidas por autenticação)
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -54,6 +58,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('produtos', ProdutoController::class);
     Route::resource('produto-variacoes', ProdutoVariacaoController::class)->parameters(['produto-variacoes' => 'produtoVariacao']);
     Route::resource('movimentacoes-estoque', MovimentacaoEstoqueController::class)->parameters(['movimentacoes-estoque' => 'movimentacaoEstoque']);
+    
+    // Rotas do Sistema de Gestão de Mercadorias
+    Route::resource('fornecedores', FornecedorController::class);
+    Route::resource('entradas-mercadoria', EntradaMercadoriaController::class)->parameters(['entradas-mercadoria' => 'entradaMercadoria']);
+    
+    // Rotas do Sistema de Vendas e Financeiro
+    Route::resource('clientes', ClienteController::class);
+    Route::resource('vendas', VendaController::class);
+    Route::resource('pagamentos', PagamentoController::class);
+    
+    // Rotas adicionais para Vendas
+    Route::post('vendas/{venda}/concluir', [VendaController::class, 'concluir'])->name('vendas.concluir');
+    Route::post('vendas/{venda}/cancelar', [VendaController::class, 'cancelar'])->name('vendas.cancelar');
+    
+    // Rotas adicionais para Pagamentos
+    Route::post('pagamentos/{pagamento}/marcar-como-pago', [PagamentoController::class, 'marcarComoPago'])->name('pagamentos.marcar-como-pago');
+    Route::post('pagamentos/{pagamento}/cancelar', [PagamentoController::class, 'cancelar'])->name('pagamentos.cancelar');
 });
 
 // API Routes para Estados, Municípios e CEP (protegidas por autenticação)

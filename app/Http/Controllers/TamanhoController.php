@@ -17,6 +17,8 @@ class TamanhoController extends Controller
      */
     public function index(Request $request): Response
     {
+        $this->checkPermission('tamanhos.index', 'Você não tem permissão para visualizar tamanhos.');
+        
         $query = Tamanho::query();
 
         // Filtro por tipo
@@ -43,6 +45,8 @@ class TamanhoController extends Controller
      */
     public function create(): Response
     {
+        $this->checkPermission('tamanhos.create', 'Você não tem permissão para criar tamanhos.');
+        
         return Inertia::render('tamanhos/Create');
     }
 
@@ -51,6 +55,8 @@ class TamanhoController extends Controller
      */
     public function store(TamanhoStoreRequest $request): RedirectResponse
     {
+        $this->checkPermission('tamanhos.store', 'Você não tem permissão para criar tamanhos.');
+        
         Tamanho::create($request->validated());
 
         return to_route('tamanhos.index')
@@ -62,6 +68,8 @@ class TamanhoController extends Controller
      */
     public function show(Tamanho $tamanho): Response
     {
+        $this->checkPermission('tamanhos.show', 'Você não tem permissão para visualizar tamanhos.');
+        
         return Inertia::render('tamanhos/Show', [
             'tamanho' => $tamanho,
         ]);
@@ -72,6 +80,8 @@ class TamanhoController extends Controller
      */
     public function edit(Tamanho $tamanho): Response
     {
+        $this->checkPermission('tamanhos.edit', 'Você não tem permissão para editar tamanhos.');
+        
         return Inertia::render('tamanhos/Edit', [
             'tamanho' => $tamanho,
         ]);
@@ -82,6 +92,8 @@ class TamanhoController extends Controller
      */
     public function update(TamanhoUpdateRequest $request, Tamanho $tamanho): RedirectResponse
     {
+        $this->checkPermission('tamanhos.update', 'Você não tem permissão para editar tamanhos.');
+        
         $tamanho->update($request->validated());
 
         return to_route('tamanhos.index')
@@ -93,6 +105,8 @@ class TamanhoController extends Controller
      */
     public function destroy(Tamanho $tamanho): RedirectResponse
     {
+        $this->checkPermission('tamanhos.delete', 'Você não tem permissão para excluir tamanhos.');
+        
         $tamanho->delete();
 
         return to_route('tamanhos.index')

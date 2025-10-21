@@ -1,0 +1,228 @@
+/* Dashboard Custom Styles */
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Dashboard Layout */
+.dashboard-container {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.dashboard-metric {
+    animation: slideInRight 0.4s ease-out;
+    animation-fill-mode: both;
+}
+
+.dashboard-metric:nth-child(1) { animation-delay: 0.1s; }
+.dashboard-metric:nth-child(2) { animation-delay: 0.2s; }
+.dashboard-metric:nth-child(3) { animation-delay: 0.3s; }
+.dashboard-metric:nth-child(4) { animation-delay: 0.4s; }
+
+/* Chart Containers */
+.chart-container {
+    position: relative;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(16, 185, 129, 0.05) 100%);
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.chart-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+    border-radius: 0.75rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.chart-container:hover::before {
+    opacity: 1;
+}
+
+/* Metric Cards */
+.metric-card {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.metric-card:hover::before {
+    left: 100%;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Trend Indicators */
+.trend-positive {
+    color: #10b981;
+    animation: pulse 2s infinite;
+}
+
+.trend-negative {
+    color: #ef4444;
+    animation: pulse 2s infinite;
+}
+
+/* Status Badges */
+.status-badge {
+    position: relative;
+    overflow: hidden;
+}
+
+.status-badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.3s ease;
+}
+
+.status-badge:hover::before {
+    left: 100%;
+}
+
+/* Table Rows */
+.table-row {
+    transition: all 0.2s ease;
+}
+
+.table-row:hover {
+    background-color: rgba(59, 130, 246, 0.05);
+    transform: scale(1.01);
+}
+
+/* Loading States */
+.loading-shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* Dark mode adjustments */
+.dark .chart-container {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+}
+
+.dark .metric-card:hover {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+.dark .table-row:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .dashboard-metric {
+        animation-delay: 0s;
+    }
+    
+    .metric-card:hover {
+        transform: none;
+    }
+    
+    .table-row:hover {
+        transform: none;
+    }
+}
+
+/* Custom scrollbar for dashboard */
+.dashboard-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dashboard-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.dashboard-container::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.3);
+    border-radius: 3px;
+}
+
+.dashboard-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.5);
+}
+
+/* Focus states for accessibility */
+.metric-card:focus-within {
+    outline: 2px solid rgba(59, 130, 246, 0.5);
+    outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+    .dashboard-container {
+        animation: none;
+    }
+    
+    .metric-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .chart-container {
+        break-inside: avoid;
+    }
+}

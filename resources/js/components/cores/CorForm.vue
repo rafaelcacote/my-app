@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import InputError from '@/components/InputError.vue';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { ColorPicker } from '@/components/ui/color-picker';
 
 interface Cor {
     id: number;
@@ -46,28 +47,14 @@ const props = defineProps<Props>();
                 <InputError :message="errors.nome" />
             </div>
 
-            <!-- Código HEX -->
+            <!-- Seleção de Cor -->
             <div class="space-y-2">
-                <Label for="codigo_hex">Código HEX *</Label>
-                <div class="flex items-center gap-3">
-                    <Input
-                        id="codigo_hex"
-                        v-model="form.codigo_hex"
-                        type="text"
-                        placeholder="#000000"
-                        :class="{ 'border-red-500': errors.codigo_hex }"
-                        :disabled="processing"
-                        class="flex-1"
-                    />
-                    <div 
-                        class="h-10 w-16 rounded border-2 border-border"
-                        :style="{ backgroundColor: form.codigo_hex || '#000000' }"
-                    />
-                </div>
+                <ColorPicker
+                    v-model="form.codigo_hex"
+                    :disabled="processing"
+                    :className="{ 'border-red-500': errors.codigo_hex }"
+                />
                 <InputError :message="errors.codigo_hex" />
-                <p class="text-xs text-muted-foreground">
-                    Digite o código hexadecimal da cor (ex: #FF0000 para vermelho)
-                </p>
             </div>
         </CardContent>
     </Card>

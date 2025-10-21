@@ -17,6 +17,8 @@ class CorController extends Controller
      */
     public function index(Request $request): Response
     {
+        $this->checkPermission('cores.index', 'Você não tem permissão para visualizar cores.');
+        
         $query = Cor::query();
 
         // Busca por nome ou código hex
@@ -41,6 +43,8 @@ class CorController extends Controller
      */
     public function create(): Response
     {
+        $this->checkPermission('cores.create', 'Você não tem permissão para criar cores.');
+        
         return Inertia::render('cores/Create');
     }
 
@@ -49,6 +53,8 @@ class CorController extends Controller
      */
     public function store(CorStoreRequest $request): RedirectResponse
     {
+        $this->checkPermission('cores.store', 'Você não tem permissão para criar cores.');
+        
         Cor::create($request->validated());
 
         return to_route('cores.index')
@@ -60,6 +66,8 @@ class CorController extends Controller
      */
     public function show(Cor $cor): Response
     {
+        $this->checkPermission('cores.show', 'Você não tem permissão para visualizar cores.');
+        
         return Inertia::render('cores/Show', [
             'cor' => $cor,
         ]);
@@ -70,6 +78,8 @@ class CorController extends Controller
      */
     public function edit(Cor $cor): Response
     {
+        $this->checkPermission('cores.edit', 'Você não tem permissão para editar cores.');
+        
         return Inertia::render('cores/Edit', [
             'cor' => $cor,
         ]);
@@ -80,6 +90,8 @@ class CorController extends Controller
      */
     public function update(CorUpdateRequest $request, Cor $cor): RedirectResponse
     {
+        $this->checkPermission('cores.update', 'Você não tem permissão para editar cores.');
+        
         $cor->update($request->validated());
 
         return to_route('cores.index')
@@ -91,6 +103,8 @@ class CorController extends Controller
      */
     public function destroy(Cor $cor): RedirectResponse
     {
+        $this->checkPermission('cores.delete', 'Você não tem permissão para excluir cores.');
+        
         $cor->delete();
 
         return to_route('cores.index')

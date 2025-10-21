@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToEmpresaThroughLoja;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class MovimentacaoEstoque extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToEmpresaThroughLoja;
 
     /**
      * The table associated with the model.

@@ -5,6 +5,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import InputError from '@/components/InputError.vue';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useForm } from '@inertiajs/vue3';
 
 interface Categoria {
     id: number;
@@ -16,8 +17,8 @@ interface Categoria {
 }
 
 interface Props {
+    form: any;
     categoria?: Categoria;
-    form?: any;
     errors: Record<string, string>;
     processing: boolean;
     isCreate?: boolean;

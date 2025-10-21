@@ -2,12 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\MovimentacaoEstoqueStoreRequest;
-use App\Http\Requests\MovimentacaoEstoqueUpdateRequest;
-use App\Models\Loja;
+use App\Helpers\EmpresaHelper;
 use App\Models\MovimentacaoEstoque;
-use App\Models\ProdutoVariacao;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -15,138 +11,225 @@ use Inertia\Response;
 class MovimentacaoEstoqueController extends Controller
 {
     /**
-     * Display a listing of movimentacoes estoque.
+     * Lista todas as movimentações da empresa atual
      */
     public function index(Request $request): Response
     {
-        $query = MovimentacaoEstoque::with(['loja', 'produtoVariacao.produto', 'produtoVariacao.tamanho', 'produtoVariacao.cor', 'usuario']);
-
-        // Filtro por tipo de movimentação
-        if ($request->filled('tipo')) {
-            $query->where('tipo', $request->tipo);
-        }
-
-        // Filtro por loja
-        if ($request->filled('loja_id')) {
-            $query->where('loja_id', $request->loja_id);
-        }
-
-        // Filtro por produto variação
-        if ($request->filled('produto_variacao_id')) {
-            $query->where('produto_variacao_id', $request->produto_variacao_id);
-        }
-
-        // Filtro por usuário
-        if ($request->filled('usuario_id')) {
-            $query->where('usuario_id', $request->usuario_id);
-        }
-
-        // Filtro por data
-        if ($request->filled('data_inicio')) {
-            $query->whereDate('created_at', '>=', $request->data_inicio);
-        }
-
-        if ($request->filled('data_fim')) {
-            $query->whereDate('created_at', '<=', $request->data_fim);
-        }
-
-        // Busca por motivo ou observação
+        $this->checkPermission('movimentacoes-estoque.index', 'Você não tem permissão para visualizar movimentações de estoque.');
+        
+        $query = MovimentacaoEstoque::with(['loja', 'produtoVariacao.produto', 'usuario']);
+        
+        // Filtros
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('motivo', 'ilike', "%{$search}%")
-                    ->orWhere('observacao', 'ilike', "%{$search}%");
+                  ->orWhere('observacao', 'ilike', "%{$search}%");
             });
         }
-
-        $movimentacoesEstoque = $query->latest()->paginate(15)->withQueryString();
-
-        // Buscar dados para filtros
-        $lojas = Loja::orderBy('nome')->get();
-        $produtoVariacoes = ProdutoVariacao::with(['produto', 'tamanho', 'cor'])->orderBy('produto_id')->get();
-
+        
+        if ($request->filled('tipo')) {
+            $query->where('tipo', $request->tipo);
+        }
+        
+        if ($request->filled('loja_id')) {
+            $query->where('loja_id', $request->loja_id);
+        }
+        
+        if ($request->filled('produto_variacao_id')) {
+            $query->where('produto_variacao_id', $request->produto_variacao_id);
+        }
+        
+        if ($request->filled('data_inicio')) {
+            $query->whereDate('created_at', '>=', $request->data_inicio);
+        }
+        
+        if ($request->filled('data_fim')) {
+            $query->whereDate('created_at', '<=', $request->data_fim);
+        }
+        
+        $movimentacoes = $query->latest()->paginate(15)->withQueryString();
+        
+        // Busca lojas da empresa atual para filtros
+        $lojas = EmpresaHelper::queryForCurrentEmpresa(\App\Models\Loja::class)
+            ->where('ativo', true)
+            ->get();
+        
         return Inertia::render('movimentacoes-estoque/Index', [
-            'movimentacoesEstoque' => $movimentacoesEstoque,
+            'movimentacoesEstoque' => $movimentacoes,
             'lojas' => $lojas,
-            'produtoVariacoes' => $produtoVariacoes,
-            'filters' => $request->only(['search', 'tipo', 'loja_id', 'produto_variacao_id', 'usuario_id', 'data_inicio', 'data_fim']),
+            'filters' => $request->only(['search', 'tipo', 'loja_id', 'produto_variacao_id', 'data_inicio', 'data_fim']),
         ]);
     }
-
+    
     /**
-     * Show the form for creating a new movimentacao estoque.
+     * Mostra o formulário de criação
      */
     public function create(): Response
     {
-        $lojas = Loja::orderBy('nome')->get();
-        $produtoVariacoes = ProdutoVariacao::with(['produto', 'tamanho', 'cor'])->orderBy('produto_id')->get();
-
+        $this->checkPermission('movimentacoes-estoque.create', 'Você não tem permissão para criar movimentações de estoque.');
+        
+        // Busca lojas da empresa atual
+        $lojas = EmpresaHelper::queryForCurrentEmpresa(\App\Models\Loja::class)
+            ->where('ativo', true)
+            ->get();
+        
+        // Busca variações de produtos da empresa atual
+        $produtoVariacoes = EmpresaHelper::queryForCurrentEmpresa(\App\Models\ProdutoVariacao::class)
+            ->with(['produto', 'tamanho', 'cor'])
+            ->where('ativo', true)
+            ->get();
+        
         return Inertia::render('movimentacoes-estoque/Create', [
             'lojas' => $lojas,
             'produtoVariacoes' => $produtoVariacoes,
         ]);
     }
-
+    
     /**
-     * Store a newly created movimentacao estoque.
+     * Cria uma nova movimentação
      */
-    public function store(MovimentacaoEstoqueStoreRequest $request): RedirectResponse
+    public function store(Request $request)
     {
-        $data = $request->validated();
-        $data['usuario_id'] = auth()->id();
-
-        MovimentacaoEstoque::create($data);
-
-        return to_route('movimentacoes-estoque.index')
-            ->with('success', 'Movimentação de estoque registrada com sucesso!');
+        $this->checkPermission('movimentacoes-estoque.store', 'Você não tem permissão para criar movimentações de estoque.');
+        
+        $request->validate([
+            'loja_id' => 'required|exists:multitenancy.lojas,id',
+            'produto_variacao_id' => 'required|exists:produtosestoques.produto_variacoes,id',
+            'tipo' => 'required|in:entrada,saida,ajuste',
+            'quantidade' => 'required|integer|min:1',
+            'motivo' => 'required|string|max:255',
+            'observacao' => 'nullable|string|max:500',
+        ]);
+        
+        // Verifica se a loja pertence à empresa atual
+        $loja = EmpresaHelper::findForCurrentEmpresa(\App\Models\Loja::class, $request->loja_id);
+        if (!$loja) {
+            return back()->withErrors(['loja_id' => 'Loja não encontrada ou não pertence à sua empresa']);
+        }
+        
+        // Verifica se a variação do produto pertence à empresa atual
+        $produtoVariacao = EmpresaHelper::findForCurrentEmpresa(\App\Models\ProdutoVariacao::class, $request->produto_variacao_id);
+        if (!$produtoVariacao) {
+            return back()->withErrors(['produto_variacao_id' => 'Variação do produto não encontrada ou não pertence à sua empresa']);
+        }
+        
+        // Calcula quantidades
+        $quantidadeAnterior = $produtoVariacao->quantidade_atual ?? 0;
+        $quantidadeAtual = $request->tipo === 'entrada' 
+            ? $quantidadeAnterior + $request->quantidade
+            : $quantidadeAnterior - $request->quantidade;
+        
+        MovimentacaoEstoque::create([
+            'loja_id' => $request->loja_id,
+            'produto_variacao_id' => $request->produto_variacao_id,
+            'tipo' => $request->tipo,
+            'quantidade' => $request->quantidade,
+            'quantidade_anterior' => $quantidadeAnterior,
+            'quantidade_atual' => $quantidadeAtual,
+            'motivo' => $request->motivo,
+            'observacao' => $request->observacao,
+            'usuario_id' => auth()->id(),
+        ]);
+        
+        // Atualiza a quantidade atual na variação do produto
+        $produtoVariacao->update(['quantidade_atual' => $quantidadeAtual]);
+        
+        return redirect()->route('movimentacoes-estoque.index')
+            ->with('success', 'Movimentação criada com sucesso!');
     }
-
+    
     /**
-     * Display the specified movimentacao estoque.
+     * Mostra uma movimentação específica
      */
-    public function show(MovimentacaoEstoque $movimentacaoEstoque): Response
+    public function show(int $id): Response
     {
-        $movimentacaoEstoque->load(['loja', 'produtoVariacao.produto', 'produtoVariacao.tamanho', 'produtoVariacao.cor', 'usuario']);
-
+        $this->checkPermission('movimentacoes-estoque.show', 'Você não tem permissão para visualizar movimentações de estoque.');
+        
+        $movimentacao = EmpresaHelper::findForCurrentEmpresa(MovimentacaoEstoque::class, $id);
+        
+        if (!$movimentacao) {
+            abort(404, 'Movimentação não encontrada');
+        }
+        
+        $movimentacao->load(['loja', 'produtoVariacao.produto', 'usuario']);
+        
         return Inertia::render('movimentacoes-estoque/Show', [
-            'movimentacaoEstoque' => $movimentacaoEstoque,
+            'movimentacao' => $movimentacao,
         ]);
     }
-
+    
     /**
-     * Show the form for editing the specified movimentacao estoque.
+     * Mostra o formulário de edição
      */
-    public function edit(MovimentacaoEstoque $movimentacaoEstoque): Response
+    public function edit(int $id): Response
     {
-        $lojas = Loja::orderBy('nome')->get();
-        $produtoVariacoes = ProdutoVariacao::with(['produto', 'tamanho', 'cor'])->orderBy('produto_id')->get();
-
+        $this->checkPermission('movimentacoes-estoque.edit', 'Você não tem permissão para editar movimentações de estoque.');
+        
+        $movimentacao = EmpresaHelper::findForCurrentEmpresa(MovimentacaoEstoque::class, $id);
+        
+        if (!$movimentacao) {
+            abort(404, 'Movimentação não encontrada');
+        }
+        
+        $movimentacao->load(['loja', 'produtoVariacao.produto', 'usuario']);
+        
         return Inertia::render('movimentacoes-estoque/Edit', [
-            'movimentacaoEstoque' => $movimentacaoEstoque,
-            'lojas' => $lojas,
-            'produtoVariacoes' => $produtoVariacoes,
+            'movimentacao' => $movimentacao,
         ]);
     }
-
+    
     /**
-     * Update the specified movimentacao estoque.
+     * Atualiza uma movimentação
      */
-    public function update(MovimentacaoEstoqueUpdateRequest $request, MovimentacaoEstoque $movimentacaoEstoque): RedirectResponse
+    public function update(Request $request, int $id)
     {
-        $movimentacaoEstoque->update($request->validated());
-
-        return to_route('movimentacoes-estoque.index')
-            ->with('success', 'Movimentação de estoque atualizada com sucesso!');
+        $this->checkPermission('movimentacoes-estoque.update', 'Você não tem permissão para editar movimentações de estoque.');
+        
+        $movimentacao = EmpresaHelper::findForCurrentEmpresa(MovimentacaoEstoque::class, $id);
+        
+        if (!$movimentacao) {
+            abort(404, 'Movimentação não encontrada');
+        }
+        
+        $request->validate([
+            'motivo' => 'required|string|max:255',
+            'observacao' => 'nullable|string|max:500',
+        ]);
+        
+        try {
+            EmpresaHelper::updateForCurrentEmpresa($movimentacao, [
+                'motivo' => $request->motivo,
+                'observacao' => $request->observacao,
+            ]);
+            
+            return redirect()->route('movimentacoes-estoque.index')
+                ->with('success', 'Movimentação atualizada com sucesso!');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => $e->getMessage()]);
+        }
     }
-
+    
     /**
-     * Remove the specified movimentacao estoque.
+     * Remove uma movimentação
      */
-    public function destroy(MovimentacaoEstoque $movimentacaoEstoque): RedirectResponse
+    public function destroy(int $id)
     {
-        $movimentacaoEstoque->delete();
-
-        return to_route('movimentacoes-estoque.index')
-            ->with('success', 'Movimentação de estoque excluída com sucesso!');
+        $this->checkPermission('movimentacoes-estoque.delete', 'Você não tem permissão para excluir movimentações de estoque.');
+        
+        $movimentacao = EmpresaHelper::findForCurrentEmpresa(MovimentacaoEstoque::class, $id);
+        
+        if (!$movimentacao) {
+            abort(404, 'Movimentação não encontrada');
+        }
+        
+        try {
+            EmpresaHelper::deleteForCurrentEmpresa($movimentacao);
+            
+            return redirect()->route('movimentacoes-estoque.index')
+                ->with('success', 'Movimentação removida com sucesso!');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => $e->getMessage()]);
+        }
     }
 }

@@ -20,6 +20,8 @@ class ProdutoVariacaoController extends Controller
      */
     public function index(Request $request): Response
     {
+        $this->checkPermission('produto-variacoes.index', 'Você não tem permissão para visualizar variações de produtos.');
+        
         $query = ProdutoVariacao::with(['produto', 'tamanho', 'cor']);
 
         // Filtro por status (ativo/inativo)
@@ -55,7 +57,7 @@ class ProdutoVariacaoController extends Controller
         $produtoVariacoes = $query->latest()->paginate(15)->withQueryString();
 
         // Buscar dados para filtros
-        $produtos = Produto::ativas()->orderBy('nome')->get();
+        $produtos = Produto::ativos()->orderBy('nome')->get();
         $tamanhos = Tamanho::ordered()->get();
         $cores = Cor::orderBy('nome')->get();
 
@@ -73,7 +75,9 @@ class ProdutoVariacaoController extends Controller
      */
     public function create(): Response
     {
-        $produtos = Produto::ativas()->orderBy('nome')->get();
+        $this->checkPermission('produto-variacoes.create', 'Você não tem permissão para criar variações de produtos.');
+        
+        $produtos = Produto::ativos()->orderBy('nome')->get();
         $tamanhos = Tamanho::ordered()->get();
         $cores = Cor::orderBy('nome')->get();
 
@@ -89,6 +93,8 @@ class ProdutoVariacaoController extends Controller
      */
     public function store(ProdutoVariacaoStoreRequest $request): RedirectResponse
     {
+        $this->checkPermission('produto-variacoes.store', 'Você não tem permissão para criar variações de produtos.');
+        
         ProdutoVariacao::create($request->validated());
 
         return to_route('produto-variacoes.index')
@@ -100,6 +106,8 @@ class ProdutoVariacaoController extends Controller
      */
     public function show(ProdutoVariacao $produtoVariacao): Response
     {
+        $this->checkPermission('produto-variacoes.show', 'Você não tem permissão para visualizar variações de produtos.');
+        
         $produtoVariacao->load(['produto', 'tamanho', 'cor']);
 
         return Inertia::render('produto-variacoes/Show', [
@@ -112,7 +120,9 @@ class ProdutoVariacaoController extends Controller
      */
     public function edit(ProdutoVariacao $produtoVariacao): Response
     {
-        $produtos = Produto::ativas()->orderBy('nome')->get();
+        $this->checkPermission('produto-variacoes.edit', 'Você não tem permissão para editar variações de produtos.');
+        
+        $produtos = Produto::ativos()->orderBy('nome')->get();
         $tamanhos = Tamanho::ordered()->get();
         $cores = Cor::orderBy('nome')->get();
 
@@ -129,6 +139,8 @@ class ProdutoVariacaoController extends Controller
      */
     public function update(ProdutoVariacaoUpdateRequest $request, ProdutoVariacao $produtoVariacao): RedirectResponse
     {
+        $this->checkPermission('produto-variacoes.update', 'Você não tem permissão para editar variações de produtos.');
+        
         $produtoVariacao->update($request->validated());
 
         return to_route('produto-variacoes.index')
@@ -140,6 +152,8 @@ class ProdutoVariacaoController extends Controller
      */
     public function destroy(ProdutoVariacao $produtoVariacao): RedirectResponse
     {
+        $this->checkPermission('produto-variacoes.delete', 'Você não tem permissão para excluir variações de produtos.');
+        
         $produtoVariacao->delete();
 
         return to_route('produto-variacoes.index')
