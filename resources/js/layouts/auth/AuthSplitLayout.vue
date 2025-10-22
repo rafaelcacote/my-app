@@ -21,7 +21,12 @@ defineProps<{
         <div
             class="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r"
         >
-            <div class="absolute inset-0 bg-zinc-900" />
+            <img 
+                src="/img/loja.png" 
+                alt="Loja de roupas"
+                class="absolute inset-0 z-0 h-full w-full object-cover"
+            />
+            <div class="absolute inset-0 z-10 bg-black/30"></div>
             <Link
                 :href="home()"
                 class="relative z-20 flex items-center text-lg font-medium"
