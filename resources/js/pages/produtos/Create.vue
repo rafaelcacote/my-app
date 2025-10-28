@@ -22,6 +22,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const form = useForm({
+    sku: '',
     nome: '',
     descricao: '',
     categoria_id: null as number | null,

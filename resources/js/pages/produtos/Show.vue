@@ -69,7 +69,7 @@ const formatCurrency = (value: number | null) => {
                         <Package class="h-8 w-8 text-primary" />
                         <h1 class="text-3xl font-bold tracking-tight text-foreground">{{ produto.nome }}</h1>
                         <Badge
-                            :variant="produto.ativo ? 'default' : 'secondary'"
+                            :variant="produto.ativo ? 'success' : 'secondary'"
                             class="ml-2"
                         >
                             {{ produto.ativo ? 'Ativo' : 'Inativo' }}
@@ -119,7 +119,7 @@ const formatCurrency = (value: number | null) => {
                         <div>
                             <span class="text-sm font-medium text-muted-foreground">Status:</span>
                             <Badge
-                                :variant="produto.ativo ? 'default' : 'secondary'"
+                                :variant="produto.ativo ? 'success' : 'secondary'"
                                 class="ml-2"
                             >
                                 {{ produto.ativo ? 'Ativo' : 'Inativo' }}

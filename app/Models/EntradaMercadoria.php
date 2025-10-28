@@ -11,6 +11,7 @@ class EntradaMercadoria extends Model
 {
     use HasFactory;
 
+    protected $connection = 'pgsql';
     protected $table = 'gestao.entradas_mercadoria';
 
     protected $fillable = [

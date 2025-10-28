@@ -59,69 +59,76 @@
 
             <!-- Table Card -->
             <Card class="border-border shadow-sm">
-                <CardContent class="p-0">
-                    <div class="overflow-x-auto">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Nome</TableHead>
-                                    <TableHead>CPF/CNPJ</TableHead>
-                                    <TableHead>Email</TableHead>
-                                    <TableHead>Telefone</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead class="text-right">Ações</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                <TableRow v-if="fornecedores.data.length === 0">
-                                    <TableCell colspan="6" class="text-center py-8 text-muted-foreground">
+                <div class="overflow-x-auto">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Nome</TableHead>
+                                <TableHead>CPF/CNPJ</TableHead>
+                                <TableHead>Email</TableHead>
+                                <TableHead>Telefone</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead class="text-right">Ações</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <TableRow
+                                v-if="fornecedores.data.length === 0"
+                                class="hover:bg-transparent"
+                            >
+                                <TableCell colspan="6" class="text-center">
+                                    <div class="py-8 text-muted-foreground">
                                         Nenhum fornecedor encontrado
-                                    </TableCell>
-                                </TableRow>
-                                <TableRow v-else v-for="fornecedor in fornecedores.data" :key="fornecedor.id">
-                                    <TableCell class="font-medium">
-                                        {{ fornecedor.nome }}
-                                    </TableCell>
-                                    <TableCell>
-                                        {{ fornecedor.cpf_cnpj || '-' }}
-                                    </TableCell>
-                                    <TableCell>
-                                        {{ fornecedor.email || '-' }}
-                                    </TableCell>
-                                    <TableCell>
-                                        {{ fornecedor.telefone || '-' }}
-                                    </TableCell>
-                                    <TableCell>
-                                        <Badge :variant="fornecedor.ativo ? 'default' : 'secondary'">
-                                            {{ fornecedor.ativo ? 'Ativo' : 'Inativo' }}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell class="text-right">
-                                        <div class="flex justify-end gap-2">
-                                            <Link :href="FornecedorController.show(fornecedor).url">
-                                                <Button variant="ghost" size="sm">
-                                                    <Eye class="h-4 w-4" />
-                                                </Button>
-                                            </Link>
-                                            <Link :href="FornecedorController.edit(fornecedor).url">
-                                                <Button variant="ghost" size="sm">
-                                                    <Pencil class="h-4 w-4" />
-                                                </Button>
-                                            </Link>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                @click="openDeleteDialog(fornecedor)"
-                                            >
-                                                <Trash2 class="h-4 w-4 text-destructive" />
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                            <TableRow v-else v-for="fornecedor in fornecedores.data" :key="fornecedor.id">
+                                <TableCell class="font-medium">
+                                    {{ fornecedor.nome }}
+                                </TableCell>
+                                <TableCell>
+                                    {{ fornecedor.cpf_cnpj || '-' }}
+                                </TableCell>
+                                <TableCell>
+                                    {{ fornecedor.email || '-' }}
+                                </TableCell>
+                                <TableCell>
+                                    {{ fornecedor.telefone || '-' }}
+                                </TableCell>
+                                <TableCell>
+                                    <Badge :variant="fornecedor.ativo ? 'success' : 'secondary'">
+                                        {{ fornecedor.ativo ? 'Ativo' : 'Inativo' }}
+                                    </Badge>
+                                </TableCell>
+                                <TableCell class="text-right">
+                                    <div class="flex justify-end gap-2">
+                                        <Link :href="FornecedorController.show(fornecedor.id).url">
+                                            <Button variant="ghost" size="sm" title="Visualizar">
+                                                <Eye class="h-4 w-4 text-blue-600 hover:text-blue-700" />
+                                                <span class="sr-only">Visualizar</span>
                                             </Button>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                    </div>
-                </CardContent>
+                                        </Link>
+                                        <Link :href="FornecedorController.edit(fornecedor.id).url">
+                                            <Button variant="ghost" size="sm" title="Editar">
+                                                <Pencil class="h-4 w-4 text-orange-600 hover:text-orange-700" />
+                                                <span class="sr-only">Editar</span>
+                                            </Button>
+                                        </Link>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            title="Excluir"
+                                            @click="openDeleteDialog(fornecedor)"
+                                        >
+                                            <Trash2 class="h-4 w-4 text-red-600 hover:text-red-700" />
+                                            <span class="sr-only">Excluir</span>
+                                        </Button>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </div>
             </Card>
 
             <!-- Pagination -->
@@ -181,6 +188,7 @@ import { index as fornecedoresIndex } from '@/routes/fornecedores';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 import { Plus, Search, Eye, Pencil, Trash2, Loader2 } from 'lucide-vue-next';
+import type { BreadcrumbItem } from '@/types';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { useToast } from '@/composables/useToast';
 import { Card, CardContent } from '@/components/ui/card';
@@ -242,9 +250,9 @@ const showDeleteDialog = ref(false);
 const empresaToDelete = ref<Fornecedor | null>(null);
 const isDeleting = ref(false);
 
-const breadcrumbs = [
-    { label: 'Dashboard', href: '/dashboard' },
-    { label: 'Fornecedores', href: null },
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Dashboard', href: '/dashboard' },
+    { title: 'Fornecedores', href: '#' },
 ];
 
 // Watchers para filtros em tempo real
@@ -260,7 +268,7 @@ watch([search, status], () => {
             preserveScroll: true,
         }
     );
-}, { debounce: 300 });
+});
 
 const openDeleteDialog = (fornecedor: Fornecedor) => {
     empresaToDelete.value = fornecedor;
@@ -271,7 +279,7 @@ const deleteFornecedor = () => {
     if (!empresaToDelete.value) return;
 
     isDeleting.value = true;
-    router.delete(FornecedorController.destroy(empresaToDelete.value).url, {
+    router.delete(FornecedorController.destroy(empresaToDelete.value.id).url, {
         onSuccess: () => {
             showDeleteDialog.value = false;
             empresaToDelete.value = null;

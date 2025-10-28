@@ -100,10 +100,6 @@ const formatDate = (date: string | null) => {
     return new Date(date).toLocaleDateString('pt-BR');
 };
 
-const getStatusBadgeVariant = (ativo: boolean) => {
-    return ativo ? 'default' : 'secondary';
-};
-
 const getTipoBadgeVariant = (tipo: string) => {
     return tipo === 'fisica' ? 'outline' : 'default';
 };
@@ -244,7 +240,7 @@ const deleteCliente = () => {
                                 <TableCell>{{ cliente.email || '-' }}</TableCell>
                                 <TableCell>{{ cliente.telefone || '-' }}</TableCell>
                                 <TableCell>
-                                    <Badge :variant="getStatusBadgeVariant(cliente.ativo)">
+                                    <Badge :variant="cliente.ativo ? 'success' : 'secondary'">
                                         {{ cliente.ativo ? 'Ativo' : 'Inativo' }}
                                     </Badge>
                                 </TableCell>
@@ -252,21 +248,25 @@ const deleteCliente = () => {
                                 <TableCell class="text-right">
                                     <div class="flex justify-end gap-2">
                                         <Link :href="ClienteController.show(cliente).url">
-                                            <Button variant="outline" size="sm">
-                                                <Eye class="h-4 w-4" />
+                                            <Button variant="ghost" size="sm" title="Visualizar">
+                                                <Eye class="h-4 w-4 text-blue-600 hover:text-blue-700" />
+                                                <span class="sr-only">Visualizar</span>
                                             </Button>
                                         </Link>
                                         <Link :href="ClienteController.edit(cliente).url">
-                                            <Button variant="outline" size="sm">
-                                                <Pencil class="h-4 w-4" />
+                                            <Button variant="ghost" size="sm" title="Editar">
+                                                <Pencil class="h-4 w-4 text-orange-600 hover:text-orange-700" />
+                                                <span class="sr-only">Editar</span>
                                             </Button>
                                         </Link>
                                         <Button
-                                            variant="outline"
+                                            variant="ghost"
                                             size="sm"
+                                            title="Excluir"
                                             @click="openDeleteDialog(cliente)"
                                         >
-                                            <Trash2 class="h-4 w-4" />
+                                            <Trash2 class="h-4 w-4 text-red-600 hover:text-red-700" />
+                                            <span class="sr-only">Excluir</span>
                                         </Button>
                                     </div>
                                 </TableCell>

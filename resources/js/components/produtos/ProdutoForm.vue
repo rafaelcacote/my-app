@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -48,11 +49,46 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const formatCurrency = (value: string) => {
+
+
+// Refs para campos de preço com máscara
+const precoCustoInput = ref('');
+const precoVendaInput = ref('');
+const ativo = ref(props.isCreate ? true : !!props.produto?.ativo);
+const controleEstoque = ref(props.isCreate ? true : !!props.produto?.controla_estoque);
+
+// Inicializar valores ao montar o componente
+watch(() => props.produto, (produto) => {
+    if (produto) {
+        precoCustoInput.value = formatCurrencyInput(produto.preco_custo);
+        precoVendaInput.value = formatCurrencyInput(produto.preco_venda);
+        ativo.value = !!produto.ativo;
+        controleEstoque.value = !!produto.controla_estoque;
+    }
+}, { immediate: true });
+
+// Função para converter número em string formatada (ex: 10.50 -> "R$ 10,50")
+const formatCurrencyInput = (value: number | null | undefined): string => {
+    if (value === null || value === undefined || value === 0) return '';
+    return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(value);
+};
+
+// Função para aplicar máscara de moeda enquanto digita
+const formatCurrency = (value: string): string => {
     // Remove tudo que não é dígito
     const digits = value.replace(/\D/g, '');
-    // Converte para centavos
+    
+    // Se não houver dígitos, retorna vazio
+    if (digits.length === 0) return '';
+    
+    // Converte para número (dividindo por 100 para ter centavos)
     const amount = parseInt(digits) / 100;
+    
     // Formata como moeda
     return new Intl.NumberFormat('pt-BR', {
         style: 'currency',
@@ -60,11 +96,44 @@ const formatCurrency = (value: string) => {
     }).format(amount);
 };
 
-const parseCurrency = (value: string) => {
+// Função para converter o valor formatado de volta para número well-formed
+const parseCurrency = (value: string): number => {
     // Remove símbolos de moeda e espaços
     const clean = value.replace(/[R$\s.]/g, '').replace(',', '.');
     return parseFloat(clean) || 0;
 };
+
+// Handlers para os inputs de preço
+const handlePrecoCustoInput = (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    precoCustoInput.value = formatCurrency(input.value);
+    // Atualiza o form com o valor numérico
+    if (props.form) {
+        props.form.preco_custo = parseCurrency(precoCustoInput.value);
+    }
+};
+
+const handlePrecoVendaInput = (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    precoVendaInput.value = formatCurrency(input.value);
+    // Atualiza o form com o valor numérico
+    if (props.form) {
+        props.form.preco_venda = parseCurrency(precoVendaInput.value);
+    }
+};
+
+// Watchers para sincronizar os valores formatados com o form
+watch(ativo, (value) => {
+    if (props.form) {
+        props.form.ativo = value;
+    }
+});
+
+watch(controleEstoque, (value) => {
+    if (props.form) {
+        props.form.controle_estoque = value;
+    }
+});
 </script>
 
 <template>
@@ -78,6 +147,20 @@ const parseCurrency = (value: string) => {
                 </CardDescription>
             </CardHeader>
             <CardContent class="space-y-6">
+                <!-- SKU -->
+                <div class="space-y-2">
+                    <Label for="sku">SKU *</Label>
+                    <Input
+                        id="sku"
+                        v-model="form.sku"
+                        type="text"
+                        placeholder="Digite o SKU do produto"
+                        :class="{ 'border-red-500': errors.sku }"
+                        :disabled="processing"
+                    />
+                    <InputError :message="errors.sku" />
+                </div>
+
                 <!-- Nome -->
                 <div class="space-y-2">
                     <Label for="nome">Nome *</Label>
@@ -198,9 +281,10 @@ const parseCurrency = (value: string) => {
                         <Label for="preco_custo">Preço de Custo</Label>
                         <Input
                             id="preco_custo"
-                            v-model="form.preco_custo"
+                            v-model="precoCustoInput"
+                            @input="handlePrecoCustoInput"
                             type="text"
-                            placeholder="0,00"
+                            placeholder="R$ 0,00"
                             :class="{ 'border-red-500': errors.preco_custo }"
                             :disabled="processing"
                         />
@@ -212,9 +296,10 @@ const parseCurrency = (value: string) => {
                         <Label for="preco_venda">Preço de Venda</Label>
                         <Input
                             id="preco_venda"
-                            v-model="form.preco_venda"
+                            v-model="precoVendaInput"
+                            @input="handlePrecoVendaInput"
                             type="text"
-                            placeholder="0,00"
+                            placeholder="R$ 0,00"
                             :class="{ 'border-red-500': errors.preco_venda }"
                             :disabled="processing"
                         />
@@ -237,7 +322,7 @@ const parseCurrency = (value: string) => {
                 <div class="flex items-center space-x-2">
                     <Switch
                         id="controla_estoque"
-                        v-model:checked="form.controla_estoque"
+                        v-model:checked="controleEstoque"
                         :disabled="processing"
                     />
                     <Label for="controla_estoque">Controlar estoque deste produto</Label>
@@ -263,7 +348,7 @@ const parseCurrency = (value: string) => {
                 <div class="flex items-center space-x-2">
                     <Switch
                         id="ativo"
-                        v-model:checked="form.ativo"
+                        v-model:checked="ativo"
                         :disabled="processing"
                     />
                     <Label for="ativo">Produto ativo</Label>

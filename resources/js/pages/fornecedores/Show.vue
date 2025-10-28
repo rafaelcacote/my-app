@@ -31,7 +31,7 @@
 
             <!-- Status Badge -->
             <div class="flex items-center gap-2">
-                <Badge :variant="fornecedor.ativo ? 'default' : 'secondary'">
+                <Badge :variant="fornecedor.ativo ? 'success' : 'secondary'">
                     {{ fornecedor.ativo ? 'Ativo' : 'Inativo' }}
                 </Badge>
             </div>

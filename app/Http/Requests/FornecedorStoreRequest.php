@@ -21,7 +21,7 @@ class FornecedorStoreRequest extends FormRequest
                 'string',
                 'max:18',
                 'regex:/^(\d{3}\.\d{3}\.\d{3}-\d{2}|\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2})$/',
-                Rule::unique('gestao.fornecedores', 'cpf_cnpj')->where('empresa_id', auth()->user()->empresa_id),
+                Rule::unique('fornecedores', 'cpf_cnpj')->where('empresa_id', auth()->user()->empresa_id),
             ],
             'email' => ['nullable', 'email', 'max:255'],
             'telefone' => ['nullable', 'string', 'max:20'],

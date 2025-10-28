@@ -12,6 +12,13 @@ class Fornecedor extends Model
     use HasFactory, BelongsToEmpresa;
 
     protected $table = 'gestao.fornecedores';
+    
+    /**
+     * The connection name for the model.
+     *
+     * @var string
+     */
+    protected $connection = 'pgsql';
 
     protected $fillable = [
         'empresa_id',

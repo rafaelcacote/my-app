@@ -138,21 +138,25 @@
                                     <TableCell class="text-right">
                                         <div class="flex justify-end gap-2">
                                             <Link :href="EntradaMercadoriaController.show(entrada).url">
-                                                <Button variant="ghost" size="sm">
-                                                    <Eye class="h-4 w-4" />
+                                                <Button variant="ghost" size="sm" title="Visualizar">
+                                                    <Eye class="h-4 w-4 text-blue-600 hover:text-blue-700" />
+                                                    <span class="sr-only">Visualizar</span>
                                                 </Button>
                                             </Link>
                                             <Link :href="EntradaMercadoriaController.edit(entrada).url">
-                                                <Button variant="ghost" size="sm">
-                                                    <Pencil class="h-4 w-4" />
+                                                <Button variant="ghost" size="sm" title="Editar">
+                                                    <Pencil class="h-4 w-4 text-orange-600 hover:text-orange-700" />
+                                                    <span class="sr-only">Editar</span>
                                                 </Button>
                                             </Link>
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
+                                                title="Excluir"
                                                 @click="openDeleteDialog(entrada)"
                                             >
-                                                <Trash2 class="h-4 w-4 text-destructive" />
+                                                <Trash2 class="h-4 w-4 text-red-600 hover:text-red-700" />
+                                                <span class="sr-only">Excluir</span>
                                             </Button>
                                         </div>
                                     </TableCell>

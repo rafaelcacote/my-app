@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, provide, ref } from 'vue';
 
 const props = defineProps<{
     modelValue?: string;
@@ -13,6 +13,9 @@ const value = computed({
     get: () => props.modelValue,
     set: (val) => emit('update:modelValue', val || ''),
 });
+
+// Provide the value for child components
+provide('selectValue', value);
 </script>
 
 <template>

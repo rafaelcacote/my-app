@@ -198,7 +198,7 @@ const formatCpf = (cpf: string | null) => {
                         <CardContent class="space-y-4">
                             <div class="flex items-center justify-between">
                                 <span class="text-sm font-medium">Usuário Ativo</span>
-                                <Badge :variant="user.ativo ? 'default' : 'secondary'">
+                                <Badge :variant="user.ativo ? 'success' : 'secondary'">
                                     {{ user.ativo ? 'Ativo' : 'Inativo' }}
                                 </Badge>
                             </div>

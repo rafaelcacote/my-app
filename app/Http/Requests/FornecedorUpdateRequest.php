@@ -23,7 +23,7 @@ class FornecedorUpdateRequest extends FormRequest
                 'string',
                 'max:18',
                 'regex:/^(\d{3}\.\d{3}\.\d{3}-\d{2}|\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2})$/',
-                Rule::unique('gestao.fornecedores', 'cpf_cnpj')
+                Rule::unique('fornecedores', 'cpf_cnpj')
                     ->ignore($fornecedorId)
                     ->where('empresa_id', auth()->user()->empresa_id),
             ],

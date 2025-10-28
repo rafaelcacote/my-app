@@ -204,7 +204,7 @@ const closeDeleteDialog = () => {
                             </TableCell>
                             <TableCell>
                                 <Badge
-                                    :variant="marca.ativo ? 'default' : 'secondary'"
+                                    :variant="marca.ativo ? 'success' : 'secondary'"
                                 >
                                     {{ marca.ativo ? 'Ativo' : 'Inativo' }}
                                 </Badge>
@@ -216,7 +216,7 @@ const closeDeleteDialog = () => {
                                 <div class="flex justify-end gap-2">
                                     <Link :href="MarcaController.show(marca).url">
                                         <Button variant="ghost" size="sm" title="Visualizar">
-                                            <Eye class="h-4 w-4 text-green-600 hover:text-green-700" />
+                                            <Eye class="h-4 w-4 text-blue-600 hover:text-blue-700" />
                                             <span class="sr-only">Visualizar</span>
                                         </Button>
                                     </Link>

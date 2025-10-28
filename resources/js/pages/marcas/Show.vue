@@ -42,7 +42,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <Tag class="h-8 w-8 text-primary" />
                         <h1 class="text-3xl font-bold tracking-tight text-foreground">{{ marca.nome }}</h1>
                         <Badge
-                            :variant="marca.ativo ? 'default' : 'secondary'"
+                            :variant="marca.ativo ? 'success' : 'secondary'"
                             class="ml-2"
                         >
                             {{ marca.ativo ? 'Ativo' : 'Inativo' }}
@@ -86,7 +86,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <div>
                             <span class="text-sm font-medium text-muted-foreground">Status:</span>
                             <Badge
-                                :variant="marca.ativo ? 'default' : 'secondary'"
+                                :variant="marca.ativo ? 'success' : 'secondary'"
                                 class="ml-2"
                             >
                                 {{ marca.ativo ? 'Ativo' : 'Inativo' }}

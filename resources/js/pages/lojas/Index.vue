@@ -241,7 +241,7 @@ const formatPhone = (phone: string | null) => {
                                 <TableCell>{{ formatPhone(loja.telefone) }}</TableCell>
                                 <TableCell>
                                     <Badge
-                                        :variant="loja.ativo ? 'default' : 'secondary'"
+                                        :variant="loja.ativo ? 'success' : 'secondary'"
                                     >
                                         {{ loja.ativo ? 'Ativo' : 'Inativo' }}
                                     </Badge>
@@ -250,7 +250,7 @@ const formatPhone = (phone: string | null) => {
                                     <div class="flex justify-end gap-2">
                                         <Link :href="`/empresas/${empresa.id}/lojas/${loja.id}/edit`">
                                             <Button variant="ghost" size="sm" title="Editar">
-                                                <Pencil class="h-4 w-4" />
+                                                <Pencil class="h-4 w-4 text-orange-600 hover:text-orange-700" />
                                                 <span class="sr-only">Editar</span>
                                             </Button>
                                         </Link>
@@ -260,7 +260,7 @@ const formatPhone = (phone: string | null) => {
                                             title="Excluir"
                                             @click="openDeleteDialog(loja)"
                                         >
-                                            <Trash2 class="h-4 w-4 text-red-500" />
+                                            <Trash2 class="h-4 w-4 text-red-600 hover:text-red-700" />
                                             <span class="sr-only">Excluir</span>
                                         </Button>
                                     </div>

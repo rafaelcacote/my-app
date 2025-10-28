@@ -129,7 +129,7 @@ const formatEndereco = (endereco: Endereco | null | undefined) => {
                             <div>
                                 <span class="text-sm font-medium text-muted-foreground">Status:</span>
                                 <Badge
-                                    :variant="empresa.ativo ? 'default' : 'secondary'"
+                                    :variant="empresa.ativo ? 'success' : 'secondary'"
                                     class="ml-2"
                                 >
                                     {{ empresa.ativo ? 'Ativa' : 'Inativa' }}

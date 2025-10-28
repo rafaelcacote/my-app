@@ -36,8 +36,8 @@ class FornecedorController extends Controller
             ]);
         }
         
-        $query = Fornecedor::with(['empresa'])
-            ->daEmpresa($empresaId);
+        // Não precisa adicionar ->daEmpresa pois o trait BelongsToEmpresa já aplica o GlobalScope
+        $query = Fornecedor::with(['empresa']);
 
         // Filtro por status (ativo/inativo)
         if ($request->has('status')) {
@@ -73,8 +73,9 @@ class FornecedorController extends Controller
     {
         $this->checkPermission('fornecedores.create', 'Você não tem permissão para criar fornecedores.');
         
-        $empresaId = auth()->user()->empresa_id;
-        $enderecos = $empresaId ? \App\Models\Endereco::where('empresa_id', $empresaId)->get() : collect();
+        // Endereços são compartilhados, não precisam filtrar por empresa
+        // O endereço será criado junto com o fornecedor se necessário
+        $enderecos = collect();
 
         return Inertia::render('fornecedores/Create', [
             'enderecos' => $enderecos,
