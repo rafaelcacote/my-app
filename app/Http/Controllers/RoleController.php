@@ -78,6 +78,11 @@ class RoleController extends Controller
      */
     public function edit(Role $perfi): Response
     {
+        $this->checkPermission('perfis.edit', 'Você não tem permissão para editar perfis.');
+
+        // Carregar o relacionamento de permissões
+        $perfi->load('permissions');
+        
         $permissionsGrouped = PermissionHelper::getAllPermissionsGrouped();
         $rolePermissions = $perfi->permissions->pluck('id')->toArray();
         
