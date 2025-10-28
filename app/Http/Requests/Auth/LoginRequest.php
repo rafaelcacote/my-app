@@ -7,6 +7,7 @@ use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\App;
 use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
@@ -32,6 +33,8 @@ class LoginRequest extends FormRequest
         ];
     }
 
+    
+
     /**
      * Validate the request's credentials and return the user without logging them in.
      *
@@ -40,6 +43,9 @@ class LoginRequest extends FormRequest
     public function validateCredentials(): User
     {
         $this->ensureIsNotRateLimited();
+
+        // Force locale to Portuguese
+        App::setLocale('pt_BR');
 
         /** @var User|null $user */
         $user = Auth::getProvider()->retrieveByCredentials($this->only('email', 'password'));
@@ -71,6 +77,9 @@ class LoginRequest extends FormRequest
         event(new Lockout($this));
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
+
+        // Force locale to Portuguese
+        App::setLocale('pt_BR');
 
         throw ValidationException::withMessages([
             'email' => trans('auth.throttle', [

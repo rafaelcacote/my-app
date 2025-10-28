@@ -1,20 +1,15 @@
 <script setup lang="ts">
 import AuthenticatedSessionController from '@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController';
 import InputError from '@/components/InputError.vue';
-import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthBase from '@/layouts/AuthLayout.vue';
-import { register } from '@/routes';
-import { request } from '@/routes/password';
 import { Form, Head } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
 
 defineProps<{
     status?: string;
-    canResetPassword: boolean;
 }>();
 </script>
 
@@ -55,17 +50,7 @@ defineProps<{
                 </div>
 
                 <div class="grid gap-2">
-                    <div class="flex items-center justify-between">
-                        <Label for="password">Senha</Label>
-                        <TextLink
-                            v-if="canResetPassword"
-                            :href="request()"
-                            class="text-sm"
-                            :tabindex="5"
-                        >
-                            Esqueceu a senha?
-                        </TextLink>
-                    </div>
+                    <Label for="password">Senha</Label>
                     <Input
                         id="password"
                         type="password"
@@ -73,22 +58,15 @@ defineProps<{
                         required
                         :tabindex="2"
                         autocomplete="current-password"
-                        placeholder="Senha"
+                        placeholder="Sua senha"
                     />
                     <InputError :message="errors.password" />
-                </div>
-
-                <div class="flex items-center justify-between">
-                    <Label for="remember" class="flex items-center space-x-3">
-                        <Checkbox id="remember" name="remember" :tabindex="3" />
-                        <span>Lembrar de mim</span>
-                    </Label>
                 </div>
 
                 <Button
                     type="submit"
                     class="mt-4 w-full"
-                    :tabindex="4"
+                    :tabindex="3"
                     :disabled="processing"
                     data-test="login-button"
                 >
@@ -98,11 +76,6 @@ defineProps<{
                     />
                     Entrar
                 </Button>
-            </div>
-
-            <div class="text-center text-sm text-muted-foreground">
-                Não tem uma conta?
-                <TextLink :href="register()" :tabindex="5">Cadastre-se</TextLink>
             </div>
         </Form>
     </AuthBase>
