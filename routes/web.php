@@ -5,6 +5,7 @@ use App\Http\Controllers\CepController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\CorController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DashboardVendedorController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\EntradaMercadoriaController;
 use App\Http\Controllers\EstadoController;
@@ -26,12 +27,17 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
     if (auth()->check()) {
+        // Redireciona para o dashboard apropriado baseado no papel do usuário
+        if (auth()->user()->hasRole('vendedor') && !auth()->user()->hasAnyRole(['administrador', 'gerente'])) {
+            return redirect()->route('dashboard.vendedor');
+        }
         return redirect()->route('dashboard');
     }
     return redirect()->route('login');
 })->name('home');
 
 Route::get('dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('dashboard/vendedor', [DashboardVendedorController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard.vendedor');
 
 // Rotas de Empresas (protegidas por autenticação)
 Route::middleware(['auth', 'verified'])->group(function () {

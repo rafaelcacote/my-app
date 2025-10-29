@@ -50,6 +50,7 @@ interface Props {
         status?: string;
         empresa_id?: string;
     };
+    isSuperAdmin: boolean;
 }
 
 const props = defineProps<Props>();
@@ -160,7 +161,7 @@ const formatCpf = (cpf: string) => {
             <!-- Filters Card -->
             <Card class="border-border shadow-sm">
                 <CardContent class="pt-6">
-                    <div class="grid gap-4 md:grid-cols-3">
+                    <div :class="isSuperAdmin ? 'grid gap-4 md:grid-cols-3' : 'grid gap-4 md:grid-cols-2'">
                         <!-- Search -->
                         <div class="space-y-2">
                             <label for="search" class="text-sm font-medium">Buscar</label>
@@ -189,8 +190,8 @@ const formatCpf = (cpf: string) => {
                             </select>
                         </div>
 
-                        <!-- Empresa Filter -->
-                        <div class="space-y-2">
+                        <!-- Empresa Filter (apenas para super admin) -->
+                        <div v-if="isSuperAdmin" class="space-y-2">
                             <label for="empresa" class="text-sm font-medium">Empresa</label>
                             <select
                                 id="empresa"

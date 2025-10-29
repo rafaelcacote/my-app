@@ -73,6 +73,13 @@ interface DashboardProps {
         total: number;
         quantidade: number;
     }>;
+    vendasPorVendedor: Array<{
+        vendedor_id: number;
+        vendedor_nome: string;
+        quantidade_vendas: number;
+        total_vendido: number;
+        ticket_medio: number;
+    }>;
     tendencias: {
         variacao_vendas: number;
         variacao_quantidade: number;
@@ -501,6 +508,62 @@ const getEstoquePercentage = (count: number) => {
                     </CardContent>
                 </Card>
             </div>
+
+            <!-- Vendas por Vendedor -->
+            <Card>
+                <CardHeader>
+                    <CardTitle class="flex items-center gap-2">
+                        <Users class="h-5 w-5" />
+                        Vendas por Vendedor
+                    </CardTitle>
+                    <CardDescription>
+                        Performance de vendas por vendedor no período
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Vendedor</TableHead>
+                                <TableHead class="text-right">Qtd. Vendas</TableHead>
+                                <TableHead class="text-right">Total Vendido</TableHead>
+                                <TableHead class="text-right">Ticket Médio</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <TableRow v-if="vendasPorVendedor.length === 0">
+                                <TableCell colspan="4" class="text-center text-muted-foreground">
+                                    Nenhuma venda registrada no período
+                                </TableCell>
+                            </TableRow>
+                            <TableRow v-for="(vendedor, index) in vendasPorVendedor" :key="vendedor.vendedor_id">
+                                <TableCell>
+                                    <div class="flex items-center gap-2">
+                                        <Badge variant="outline" class="w-6 h-6 flex items-center justify-center text-xs">
+                                            {{ index + 1 }}
+                                        </Badge>
+                                        <Avatar class="h-6 w-6">
+                                            <AvatarFallback class="text-xs">
+                                                {{ vendedor.vendedor_nome.charAt(0).toUpperCase() }}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <span class="font-medium">{{ vendedor.vendedor_nome }}</span>
+                                    </div>
+                                </TableCell>
+                                <TableCell class="text-right font-medium">
+                                    {{ vendedor.quantidade_vendas }}
+                                </TableCell>
+                                <TableCell class="text-right font-medium">
+                                    {{ formatCurrency(vendedor.total_vendido) }}
+                                </TableCell>
+                                <TableCell class="text-right font-medium">
+                                    {{ formatCurrency(vendedor.ticket_medio) }}
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
         </div>
     </AppLayout>
 </template>

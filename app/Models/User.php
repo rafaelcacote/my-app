@@ -98,4 +98,20 @@ class User extends Authenticatable
             ->withPivot(['created_at'])
             ->withTimestamps(['created_at']);
     }
+
+    /**
+     * Verifica se o usuário é o super admin (admin@admin.com).
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->email === 'admin@admin.com';
+    }
+
+    /**
+     * Scope para filtrar usuários pela empresa.
+     */
+    public function scopeByEmpresa($query, $empresaId)
+    {
+        return $query->where('empresa_id', $empresaId);
+    }
 }

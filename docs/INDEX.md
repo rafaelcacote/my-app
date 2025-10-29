@@ -311,6 +311,28 @@ Patterns
 
 ---
 
+### 📊 [DASHBOARD-VENDEDOR.md](./DASHBOARD-VENDEDOR.md) 🆕
+**Dashboard Específico para Vendedores**
+
+#### Conteúdo:
+- 🎯 Visão geral do sistema
+- 💻 Backend - DashboardController e DashboardVendedorController
+- 🎨 Frontend - Dashboard principal e Dashboard do vendedor
+- 🔐 Sistema de permissões e roles (Vendedor, Gerente, Admin, Estoquista)
+- 🛣️ Rotas e redirecionamento automático
+- 📈 Métricas e KPIs do vendedor
+- 🎁 Sistema de metas e comissões
+- 📊 Relatórios e análises
+- 💡 Sugestões de melhorias futuras
+
+**Ideal para:** Implementar e entender o sistema de dashboard por perfil
+
+**Documentos Relacionados:**
+- **[GUIA-RAPIDO-DASHBOARD-VENDEDOR.md](./GUIA-RAPIDO-DASHBOARD-VENDEDOR.md)** - Setup e uso rápido
+- **[RESUMO-IMPLEMENTACAO-DASHBOARD-VENDEDOR.md](./RESUMO-IMPLEMENTACAO-DASHBOARD-VENDEDOR.md)** - Resumo executivo
+
+---
+
 ## 🗺️ Mapa de Navegação
 
 ### Por Tarefa:
@@ -406,6 +428,13 @@ Patterns
 **Upload de Arquivos**
 → [CRUD-EMPRESAS-REFERENCE.md - Upload](./CRUD-EMPRESAS-REFERENCE.md#-upload-de-arquivos)
 
+**Dashboard e Métricas**
+→ [DASHBOARD-VENDEDOR.md](./DASHBOARD-VENDEDOR.md) 🆕
+→ [GUIA-RAPIDO-DASHBOARD-VENDEDOR.md](./GUIA-RAPIDO-DASHBOARD-VENDEDOR.md) 🆕
+
+**Permissões e Roles**
+→ [DASHBOARD-VENDEDOR.md - Permissões](./DASHBOARD-VENDEDOR.md#3-sistema-de-permissões)
+
 **Composables**
 → [FRONTEND-ARCHITECTURE.md - Composables](./FRONTEND-ARCHITECTURE.md#composables)
 
@@ -426,6 +455,9 @@ Patterns
 
 **Deploy**
 → [DEVELOPMENT-GUIDE.md - Deploy](./DEVELOPMENT-GUIDE.md#deploy)
+
+**Troubleshooting Queries SQL**
+→ [TROUBLESHOOTING-QUERIES.md](./TROUBLESHOOTING-QUERIES.md) 🆕
 
 ---
 

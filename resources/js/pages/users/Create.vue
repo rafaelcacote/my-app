@@ -17,6 +17,7 @@ interface Role {
 interface Props {
     empresas: Empresa[];
     roles: Role[];
+    isSuperAdmin: boolean;
 }
 
 const props = defineProps<Props>();
@@ -81,6 +82,7 @@ const handleSubmit = () => {
                     :isCreate="true"
                     :empresas="empresas"
                     :roles="roles"
+                    :isSuperAdmin="isSuperAdmin"
                 />
                 
                 <FormActions 

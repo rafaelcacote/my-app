@@ -25,7 +25,13 @@ class UserController extends Controller
     {
         $this->checkPermission('users.index', 'Você não tem permissão para visualizar usuários.');
 
+        $currentUser = auth()->user();
         $query = User::with(['empresa', 'lojas']);
+
+        // Se não for super admin, filtrar apenas usuários da mesma empresa
+        if (!$currentUser->isSuperAdmin()) {
+            $query->where('empresa_id', $currentUser->empresa_id);
+        }
 
         // Filtro por status (ativo/inativo)
         if ($request->has('status')) {
@@ -36,8 +42,8 @@ class UserController extends Controller
             }
         }
 
-        // Filtro por empresa
-        if ($request->filled('empresa_id')) {
+        // Filtro por empresa (apenas para super admin)
+        if ($request->filled('empresa_id') && $currentUser->isSuperAdmin()) {
             $query->where('empresa_id', $request->empresa_id);
         }
 
@@ -52,13 +58,20 @@ class UserController extends Controller
 
         $users = $query->latest()->paginate(15)->withQueryString();
 
-        // Buscar empresas para filtro
-        $empresas = Empresa::ativas()->orderBy('razao_social')->get(['id', 'razao_social']);
+        // Buscar empresas para filtro (todas para super admin, apenas a do usuário para outros)
+        if ($currentUser->isSuperAdmin()) {
+            $empresas = Empresa::ativas()->orderBy('razao_social')->get(['id', 'razao_social']);
+        } else {
+            $empresas = Empresa::where('id', $currentUser->empresa_id)
+                ->orderBy('razao_social')
+                ->get(['id', 'razao_social']);
+        }
 
         return Inertia::render('users/Index', [
             'users' => $users,
             'empresas' => $empresas,
             'filters' => $request->only(['search', 'status', 'empresa_id']),
+            'isSuperAdmin' => $currentUser->isSuperAdmin(),
         ]);
     }
 
@@ -69,12 +82,23 @@ class UserController extends Controller
     {
         $this->checkPermission('users.create', 'Você não tem permissão para criar usuários.');
 
-        $empresas = Empresa::ativas()->orderBy('razao_social')->get(['id', 'razao_social']);
+        $currentUser = auth()->user();
+
+        // Buscar empresas (todas para super admin, apenas a do usuário para outros)
+        if ($currentUser->isSuperAdmin()) {
+            $empresas = Empresa::ativas()->orderBy('razao_social')->get(['id', 'razao_social']);
+        } else {
+            $empresas = Empresa::where('id', $currentUser->empresa_id)
+                ->orderBy('razao_social')
+                ->get(['id', 'razao_social']);
+        }
+
         $roles = Role::orderBy('name')->get(['id', 'name']);
         
         return Inertia::render('users/Create', [
             'empresas' => $empresas,
             'roles' => $roles,
+            'isSuperAdmin' => $currentUser->isSuperAdmin(),
         ]);
     }
 
@@ -85,7 +109,27 @@ class UserController extends Controller
     {
         $this->checkPermission('users.store', 'Você não tem permissão para criar usuários.');
 
+        $currentUser = auth()->user();
         $data = $request->validated();
+
+        // Se não for super admin, forçar empresa_id do usuário logado
+        if (!$currentUser->isSuperAdmin()) {
+            $data['empresa_id'] = $currentUser->empresa_id;
+        }
+
+        // Validar que empresa_id foi fornecido
+        if (empty($data['empresa_id'])) {
+            return back()
+                ->withInput()
+                ->withErrors(['empresa_id' => 'A empresa é obrigatória.']);
+        }
+
+        // Se não for super admin, validar que a empresa é a mesma do usuário
+        if (!$currentUser->isSuperAdmin() && $data['empresa_id'] != $currentUser->empresa_id) {
+            return back()
+                ->withInput()
+                ->withErrors(['empresa_id' => 'Você só pode criar usuários para sua própria empresa.']);
+        }
         
         DB::beginTransaction();
         try {
@@ -149,6 +193,13 @@ class UserController extends Controller
     {
         $this->checkPermission('users.show', 'Você não tem permissão para visualizar usuários.');
 
+        $currentUser = auth()->user();
+
+        // Se não for super admin, verificar se o usuário pertence à mesma empresa
+        if (!$currentUser->isSuperAdmin() && $user->empresa_id != $currentUser->empresa_id) {
+            abort(403, 'Você não tem permissão para visualizar este usuário.');
+        }
+
         $user->load(['empresa', 'lojas']);
         
         return Inertia::render('users/Show', [
@@ -163,15 +214,31 @@ class UserController extends Controller
     {
         $this->checkPermission('users.edit', 'Você não tem permissão para editar usuários.');
 
+        $currentUser = auth()->user();
+
+        // Se não for super admin, verificar se o usuário pertence à mesma empresa
+        if (!$currentUser->isSuperAdmin() && $user->empresa_id != $currentUser->empresa_id) {
+            abort(403, 'Você não tem permissão para editar este usuário.');
+        }
+
         $user->load(['empresa', 'lojas', 'roles']);
         
-        $empresas = Empresa::ativas()->orderBy('razao_social')->get(['id', 'razao_social']);
+        // Buscar empresas (todas para super admin, apenas a do usuário para outros)
+        if ($currentUser->isSuperAdmin()) {
+            $empresas = Empresa::ativas()->orderBy('razao_social')->get(['id', 'razao_social']);
+        } else {
+            $empresas = Empresa::where('id', $currentUser->empresa_id)
+                ->orderBy('razao_social')
+                ->get(['id', 'razao_social']);
+        }
+
         $roles = Role::orderBy('name')->get(['id', 'name']);
         
         return Inertia::render('users/Edit', [
             'user' => $user,
             'empresas' => $empresas,
             'roles' => $roles,
+            'isSuperAdmin' => $currentUser->isSuperAdmin(),
         ]);
     }
 
@@ -182,7 +249,26 @@ class UserController extends Controller
     {
         $this->checkPermission('users.update', 'Você não tem permissão para editar usuários.');
 
+        $currentUser = auth()->user();
+
+        // Se não for super admin, verificar se o usuário pertence à mesma empresa
+        if (!$currentUser->isSuperAdmin() && $user->empresa_id != $currentUser->empresa_id) {
+            return back()->withErrors(['error' => 'Você não tem permissão para editar este usuário.']);
+        }
+
         $data = $request->validated();
+
+        // Se não for super admin, forçar empresa_id do usuário logado
+        if (!$currentUser->isSuperAdmin()) {
+            $data['empresa_id'] = $currentUser->empresa_id;
+        }
+
+        // Se não for super admin, validar que a empresa não foi alterada
+        if (!$currentUser->isSuperAdmin() && isset($data['empresa_id']) && $data['empresa_id'] != $currentUser->empresa_id) {
+            return back()
+                ->withInput()
+                ->withErrors(['empresa_id' => 'Você só pode editar usuários da sua própria empresa.']);
+        }
         
         DB::beginTransaction();
         try {
@@ -246,9 +332,16 @@ class UserController extends Controller
     {
         $this->checkPermission('users.delete', 'Você não tem permissão para excluir usuários.');
 
+        $currentUser = auth()->user();
+
         // Não permitir exclusão do próprio usuário
-        if ($user->id === auth()->id()) {
+        if ($user->id === $currentUser->id) {
             return back()->withErrors(['error' => 'Você não pode excluir seu próprio usuário.']);
+        }
+
+        // Se não for super admin, verificar se o usuário pertence à mesma empresa
+        if (!$currentUser->isSuperAdmin() && $user->empresa_id != $currentUser->empresa_id) {
+            return back()->withErrors(['error' => 'Você não tem permissão para excluir este usuário.']);
         }
         
         $user->delete();

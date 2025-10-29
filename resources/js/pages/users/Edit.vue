@@ -19,6 +19,7 @@ interface Props {
     user: UserType;
     empresas: Empresa[];
     roles: Role[];
+    isSuperAdmin: boolean;
 }
 
 const props = defineProps<Props>();
@@ -102,6 +103,7 @@ const handleSubmit = () => {
                     :processing="form.processing"
                     :empresas="empresas"
                     :roles="roles"
+                    :isSuperAdmin="isSuperAdmin"
                 />
                 
                 <FormActions 

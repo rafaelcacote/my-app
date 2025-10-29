@@ -34,5 +34,19 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // Renderizar página 403 customizada com Inertia
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $e, $request) {
+            if ($e->getStatusCode() === 403 && $request->expectsJson()) {
+                return response()->json([
+                    'message' => $e->getMessage() ?: 'Acesso negado',
+                ], 403);
+            }
+            
+            if ($e->getStatusCode() === 403) {
+                return \Inertia\Inertia::render('Errors/403', [
+                    'status' => 403,
+                    'message' => $e->getMessage() ?: 'Você não tem permissão para acessar esta página.',
+                ])->toResponse($request)->setStatusCode(403);
+            }
+        });
     })->create();

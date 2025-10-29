@@ -94,6 +94,9 @@ class DashboardController extends Controller
         // Tendências de vendas (comparação com período anterior)
         $tendencias = $this->obterTendencias($empresaId, $periodoInicio, $periodoFim);
         
+        // Vendas por vendedor
+        $vendasPorVendedor = $this->obterVendasPorVendedor($empresaId, $periodoInicio, $periodoFim);
+        
         return inertia('Dashboard/Index', [
             'metricas' => $metricas,
             'vendasPorPeriodo' => $vendasPorPeriodo,
@@ -103,6 +106,7 @@ class DashboardController extends Controller
             'statusEstoque' => $statusEstoque,
             'clientesAtivos' => $clientesAtivos,
             'vendasPorLoja' => $vendasPorLoja,
+            'vendasPorVendedor' => $vendasPorVendedor,
             'tendencias' => $tendencias,
             'periodo' => [
                 'inicio' => $periodoInicio,
@@ -383,5 +387,36 @@ class DashboardController extends Controller
             'quantidade_atual' => $quantidadeAtual,
             'quantidade_anterior' => $quantidadeAnterior,
         ];
+    }
+    
+    private function obterVendasPorVendedor($empresaId, $periodoInicio, $periodoFim)
+    {
+        // Removemos o global scope para evitar ambiguidade de empresa_id
+        $vendas = Venda::withoutGlobalScope('empresa')
+            ->where('vendasfinanceiro.vendas.empresa_id', $empresaId)
+            ->whereBetween('vendasfinanceiro.vendas.data_venda', [$periodoInicio, $periodoFim])
+            ->where('vendasfinanceiro.vendas.status', 'concluida')
+            ->join('shared.users', 'vendasfinanceiro.vendas.usuario_id', '=', 'shared.users.id')
+            ->selectRaw('
+                shared.users.id as vendedor_id,
+                shared.users.name as vendedor_nome,
+                COUNT(*) as quantidade_vendas,
+                SUM(vendasfinanceiro.vendas.total) as total_vendido,
+                AVG(vendasfinanceiro.vendas.total) as ticket_medio
+            ')
+            ->groupBy('shared.users.id', 'shared.users.name')
+            ->orderByDesc('total_vendido')
+            ->limit(10)
+            ->get();
+        
+        return $vendas->map(function($venda) {
+            return [
+                'vendedor_id' => $venda->vendedor_id,
+                'vendedor_nome' => $venda->vendedor_nome,
+                'quantidade_vendas' => (int) $venda->quantidade_vendas,
+                'total_vendido' => (float) $venda->total_vendido,
+                'ticket_medio' => (float) $venda->ticket_medio,
+            ];
+        });
     }
 }

@@ -23,11 +23,13 @@ interface Props {
     isCreate?: boolean;
     empresas: Empresa[];
     roles: Role[];
+    isSuperAdmin?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     user: undefined,
-    isCreate: false
+    isCreate: false,
+    isSuperAdmin: false
 });
 
 // Estado local para campos
@@ -255,6 +257,9 @@ onMounted(() => {
             props.form.lojas = [...lojasSelecionadas.value];
             props.form.roles = [...perfisSelecionados.value];
         }
+    } else if (!props.isSuperAdmin && props.empresas.length === 1) {
+        // Se não for super admin e houver apenas uma empresa, selecionar automaticamente
+        selecionarEmpresa(props.empresas[0].id.toString(), true);
     }
     
     // Garantir que form.lojas e form.roles estão inicializados mesmo sem user
@@ -263,7 +268,7 @@ onMounted(() => {
     }
     if (props.form && !props.form.roles) {
         props.form.roles = [];
-    }
+}
 });
 </script>
 
@@ -390,8 +395,10 @@ onMounted(() => {
 
          <!-- Linha 3: Empresa -->
          <div class="space-y-2">
-             <Label>Empresa</Label>
-             <div class="relative">
+             <Label>Empresa {{ !isSuperAdmin ? '' : '*' }}</Label>
+             
+             <!-- Campo de busca (apenas para super admin) -->
+             <div v-if="isSuperAdmin" class="relative">
                  <Input
                      v-model="empresaSearch"
                      placeholder="Digite para buscar empresa..."
@@ -401,8 +408,8 @@ onMounted(() => {
                  <Building2 class="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
              </div>
              
-             <!-- Lista de empresas filtradas -->
-             <div v-if="empresaSearch && empresasFiltradas.length > 0" class="max-h-48 overflow-y-auto border rounded-md bg-background">
+             <!-- Lista de empresas filtradas (apenas para super admin) -->
+             <div v-if="isSuperAdmin && empresaSearch && empresasFiltradas.length > 0" class="max-h-48 overflow-y-auto border rounded-md bg-background">
                  <div class="px-3 py-2 text-xs text-muted-foreground border-b bg-muted/50">
                      Use ↑↓ para navegar, Enter para selecionar, Esc para cancelar
                  </div>
@@ -431,6 +438,7 @@ onMounted(() => {
                      </div>
                  </div>
                  <Button
+                     v-if="isSuperAdmin"
                      type="button"
                      variant="outline"
                      size="sm"
